@@ -8,8 +8,9 @@ Track 3
 
 โครงสร้างข้อมูลที่ใช้ (Data Structures)
 - Hash Map (Dictionary): ใช้ `Semester` เป็น Key เพื่อการเข้าถึงข้อมูลที่รวดเร็ว (O(1))
-- Data Aggregation: อัลกอริทึมการคำนวณหน่วยกิตโดยการประมวลผลข้อมูลจาก Map
+- Data Aggregation(การรวมกลุ่ม): อัลกอริทึมการคำนวณหน่วยกิตโดยการประมวลผลข้อมูลจาก Map
 
-วิธีการใช้งาน (Usage)
-1. ติดตั้ง Library: `pip install pandas tabulate`
-2. รันไฟล์: `python main.py`
+วิธีการใช้งานบนcolab (Usage)
+1. สร้างไฟล์ของCOLABขึ้นมา
+2. อัพโหลดไฟล์ CprE_Subject.csv
+3. รันcodeจากที่นำมาจาก Main.py
