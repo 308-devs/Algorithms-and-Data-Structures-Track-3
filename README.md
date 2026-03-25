@@ -10,6 +10,6 @@ Track 3
 - Hash Map (Dictionary): ใช้ `Semester` เป็น Key เพื่อการเข้าถึงข้อมูลที่รวดเร็ว (O(1))
 - Data Aggregation: อัลกอริทึมการคำนวณหน่วยกิตโดยการประมวลผลข้อมูลจาก Map
 
-🚀 วิธีการใช้งาน (Usage)
+วิธีการใช้งาน (Usage)
 1. ติดตั้ง Library: `pip install pandas tabulate`
 2. รันไฟล์: `python main.py`
