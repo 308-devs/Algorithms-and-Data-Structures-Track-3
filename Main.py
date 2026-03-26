@@ -3,98 +3,71 @@ import pandas as pd
 class CoursePlanner:
     def __init__(self, file_path):
         try:
-            # อ่านไฟล์และลบช่องว่างที่ชื่อคอลัมน์
             df = pd.read_csv(file_path)
             df.columns = df.columns.str.strip()
-
-            # --- Data Structure: Maps/Hash Table (ใช้ชื่อ semester ตามที่ต้องการ) ---
             self.semester = {}
             for _, row in df.iterrows():
                 sem_key = int(float(row['Semester']))
                 if sem_key not in self.semester:
                     self.semester[sem_key] = []
                 self.semester[sem_key].append(row.to_dict())
-
-            print("✅ โหลดข้อมูลรายวิชาเรียบร้อยแล้ว")
+            print("✅ โหลดข้อมูลและจัดโครงสร้างแบบ Map เรียบร้อยแล้ว")
         except Exception as e:
-            print(f"❌ เกิดข้อผิดพลาด: {e}")
+            print(f"❌ Error: {e}")
             self.semester = {}
 
+    def recursive_sum(self, course_list):
+        if not course_list:
+            return 0
+        
+        current_credit = int(str(course_list[0].get('Credit', '0'))[0])
+        return current_credit + self.recursive_sum(course_list[1:])
+
     def show_semester(self, num):
-        """Lists all courses in that specific semester"""
         courses = self.semester.get(num)
         if courses:
             print(f"\n>> show_semester {num}")
             for c in courses:
-                code = c.get('CourseCode', 'N/A')
-                name = c.get('Name', 'N/A')
-                # ดึงเลขหน่วยกิตตัวแรก เช่น 3(3-0) -> 3
-                credit = str(c.get('Credit', '0'))[0]
-                print(f"- {code}: {name} ({credit})")
+                print(f"- {c['CourseCode']}: {c['Name']} ({str(c['Credit'])[0]})")
         else:
-            print(f"⚠️ ไม่พบข้อมูลในเทอม {num}")
+            print(f"⚠️ ไม่พบข้อมูลเทอม {num}")
 
     def total_credits(self, num):
-        """Sum credits for that semester"""
-        courses = self.semester.get(num)
+        courses = self.semester.get(num, [])
         if courses:
-            total = sum(int(str(c.get('Credit', '0'))[0]) for c in courses)
+            total = self.recursive_sum(courses)
             print(f"\n>> total_credits {num}")
-            print(f"Found {len(courses)} courses. Total: {total} Credits.")
+            print(f"Total: {total} Credits.")
         else:
-            print(f"⚠️ ไม่พบข้อมูลในเทอม {num}")
+            print(f"⚠️ ไม่พบข้อมูล")
 
     def plan_summary(self):
-        """Shows Year 1 (Sem 1+2), Year 2 (Sem 3+4), etc."""
         if not self.semester: return
-
         print("\n>> plan_summary")
-        # หาเทอมสูงสุดที่มีเพื่อคำนวณจำนวนปี
         max_sem = max(self.semester.keys())
         max_year = (max_sem + 1) // 2
-
+        
         for year in range(1, max_year + 1):
             s1, s2 = (year * 2) - 1, (year * 2)
-            # ดึงข้อมูลจาก Map (ถ้าไม่มีให้เป็น List ว่าง)
-            c1 = self.semester.get(s1, [])
-            c2 = self.semester.get(s2, [])
-
-            t1 = sum(int(str(c.get('Credit', '0'))[0]) for c in c1)
-            t2 = sum(int(str(c.get('Credit', '0'))[0]) for c in c2)
-
-            print(f"Year {year}: {t1 + t2} Credits")
+            combined_courses = self.semester.get(s1, []) + self.semester.get(s2, [])
+            total = self.recursive_sum(combined_courses)
+            print(f"Year {year}: {total} Credits")
 
     def run_menu(self):
         while True:
             print("\n" + "="*45)
-            print("  🎓 CPRe Course Planner (CLI Menu)")
+            print("  🎓 CPRe Course Planner ")
             print("="*45)
-            print("  1. show_semester")
-            print("  2. total_credits")
-            print("  3. plan_summary")
-            print("  4. exit")
-            print("-" * 45)
-
-            choice = input("เลือกเมนู (1-4): ").strip()
-
+            print("  1. show_semester\n  2. total_credits\n  3. plan_summary\n  4. exit")
+            choice = input("เลือกเมนู: ").strip()
             if choice == '1':
-                try:
-                    n = int(input("กรอกเลขเทอม: "))
-                    self.show_semester(n)
-                except ValueError: print("❌ กรุณากรอกเป็นตัวเลข")
+                try: self.show_semester(int(input("กรอกเลขเทอม: ")))
+                except: print("❌ กรุณากรอกตัวเลข")
             elif choice == '2':
-                try:
-                    n = int(input("กรอกเลขเทอม: "))
-                    self.total_credits(n)
-                except ValueError: print("❌ กรุณากรอกเป็นตัวเลข")
-            elif choice == '3':
-                self.plan_summary()
-            elif choice == '4':
-                print("👋 ปิดโปรแกรม...")
-                break
-            else:
-                print("❌ คำสั่งไม่ถูกต้อง")
+                try: self.total_credits(int(input("กรอกเลขเทอม: ")))
+                except: print("❌ กรุณากรอกตัวเลข")
+            elif choice == '3': self.plan_summary()
+            elif choice == '4': break
 
-# --- เริ่มรัน ---
 planner = CoursePlanner('CprE_Subject.csv')
 planner.run_menu()
